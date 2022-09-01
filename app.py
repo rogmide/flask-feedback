@@ -1,6 +1,7 @@
+from crypt import methods
 from flask import Flask, request, redirect, render_template, session, flash
-from models import User, Tweet, db, connect_db
-from forms import RegisterForm, TweetForm
+from models import User, db, connect_db
+from forms import RegisterForm, TweetForm, UserSignInForm
 from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import IntegrityError
 
@@ -19,21 +20,6 @@ connect_db(app)
 def home_page():
     '''Show Home Page'''
 
-    # # Work factor is the time that the encryption is going to take to generate the hash
-    # # Random string that is going to be addeed to our password
-    # salt = bcrypt.gensalt()
-    # # Password hash need to add b'password for some reason'
-    # user_pws = b'pws123'
-    # pws = bcrypt.hashpw(user_pws, salt)
-
-    # Initialize
-    # bcrypt = Bcrypt()
-
-    # user_pws = bcrypt.generate_password_hash("pws123")
-    # print('===========', user_pws)
-    # isOwner = bcrypt.check_password_hash(user_pws, 'asdfasdfa')
-    # print('===========', isOwner)
-
     # db.drop_all()
     # db.create_all()
 
@@ -44,14 +30,19 @@ def home_page():
 def register():
     '''Register a User in to the app'''
 
-    form = RegisterForm()
+    form = UserSignInForm()
 
     if form.validate_on_submit():
 
-        name = form.username.data
-        pwd = form.password.data
-        user = User.register(name, pwd)
+        username = form.username.data
+        password = form.password.data
+        email = form.email.data
+        first_name = form.first_name.data
+        last_name = form.last_name.data
+
+        user = User.register(username, password, email, first_name, last_name)
         db.session.add(user)
+
         try:
             db.session.commit()
         except IntegrityError:
@@ -59,10 +50,11 @@ def register():
             return render_template('register.html', user_regi=form)
 
         session['user_id'] = user.id
+        session['user_name'] = user.username
 
         flash('Welcome! Successfully Created Your Account!', 'success')
 
-        return redirect('/')
+        return redirect('/secret')
     else:
 
         return render_template('register.html', user_regi=form)
@@ -83,12 +75,25 @@ def login():
 
         if user:
             session['user_id'] = user.id
-            flash(f'Welcome Back, {user.username}!', 'primary')
-            return redirect('/tweets')
+            session['user_name'] = user.username
+            flash(f'You made it!, {user.username}!', 'primary')
+            return redirect('/secret')
         else:
             form.username.errors = ['Invalid username/password']
 
     return render_template('login.html', user_regi=form)
+
+
+@app.route('/users/<username>', methods=['GET', 'POST'])
+def get_user(username):
+    '''Get User and SHow information on Page'''
+
+    if 'user_id' not in session:
+        flash('You mush be logged to get here', 'danger')
+        return redirect('/')
+    else:
+        user = User.query.filter_by(username=username).first()
+        return render_template('user_info.html', user=user)
 
 
 @app.route('/secret')
@@ -101,49 +106,7 @@ def get_secret_page():
         return render_template('secret.html')
 
 
-@app.route('/tweets', methods=['GET', 'POST'])
-def get_tweets_page():
-    '''Check if user is login and render tweets pages'''
-
-    if 'user_id' not in session:
-        flash('Please login first!', 'danger ')
-        return redirect('/')
-
-    form = TweetForm()
-
-    all_tweets = Tweet.query.all()
-
-    if form.validate_on_submit():
-        text = form.text.data
-        new_tweet = Tweet(text=text, user_id=session['user_id'])
-        db.session.add(new_tweet)
-        db.session.commit()
-        flash('Tweet is Created', 'info ')
-        return redirect('/tweets')
-
-    return render_template('tweets.html', form=form, all_tweets=all_tweets)
-
-
-@app.route('/tweets/<int:id>', methods=['POST'])
-def delete_tweet(id):
-    '''Delete Tweet for a user'''
-
-    if 'user_id' not in session:
-        flash('Plz login first', 'danger')
-        return redirect('/login')
-
-    tweet = Tweet.query.get_or_404(id)
-
-    if tweet.user_id == session['user_id']:
-        db.session.delete(tweet)
-        db.session.commit()
-        flash('Tweet Deleted', 'info')
-        return redirect('/tweets')
-    flash('Is not your tweet to delete', 'danger')
-    return redirect('/tweets')
-
-
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
 def logout():
     '''logout user from the app'''
 

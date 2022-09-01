@@ -45,19 +45,34 @@
           <ul class="navbar-nav">
             {% if 'user_id' not in session %}
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/login"
-                >Login</a
-              >
+              <form action="/login" method="GET">
+                <button class="btn btn-close-white">Login</button>
+              </form>
             </li>
             {% endif %} {% if 'user_id' not in session %}
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/register"
-                >Signup</a
-              >
+              <form action="/register" method="GET">
+                <button class="btn btn-close-white">Signup</button>
+              </form>
             </li>
             {% endif %} {% if 'user_id' in session %}
             <li class="nav-item">
-              <a class="nav-link active" href="/logout">Logout</a>
+              <form action="/users/{{ session['user_name'] }}" method="GET">
+                <button class="btn btn-close-white">
+                  <b class="text-info"
+                    >{{ session['user_name'][0].upper() }}{{
+                    session['user_name'][1::] }}</b
+                  >
+                </button>
+              </form>
+              <!-- <a class="nav-link active" href="/logout">Logout</a> -->
+            </li>
+            {% endif %} {% if 'user_id' in session %}
+            <li class="nav-item">
+              <form action="/logout" method="POST">
+                <button class="btn btn-close-white">Logout</button>
+              </form>
+              <!-- <a class="nav-link active" href="/logout">Logout</a> -->
             </li>
             {% endif %}
             <!-- 

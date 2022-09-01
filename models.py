@@ -13,7 +13,7 @@ def connect_db(app):
 
 
 class User(db.Model):
-    "Site user."
+    '''User model for the site'''
 
     __tablename__ = "users"
 
@@ -28,8 +28,44 @@ class User(db.Model):
     password = db.Column(db.Text,
                          nullable=False)
 
+    email = db.Column(db.String(50),
+                      nullable=False,
+                      unique=True)
+
+    first_name = db.Column(db.String(30),
+                           nullable=False,
+                           unique=True)
+
+    last_name = db.Column(db.String(30),
+                          nullable=False,
+                          unique=True)
+
+    def __repr__(self):
+        '''Better Representation of the class'''
+        u = self
+        return f'<User id={u.id} name={u.first_name} last_name={u.last_name} email={u.email}>'
+
+    @property
+    def fullname(self):
+        '''Property to acces to the user full name'''
+        return '{} {}'.format(self.first_name, self.last_name)
+
+    @fullname.setter
+    def fullname(self, name):
+        '''Set User full name variables first, middle and last name
+        Note: middle name can be empty
+        '''
+        self.first_name, self.last_name = name.split(' ')
+
+    @fullname.deleter
+    def fullname(self, name):
+        '''Set User full name variables first, middle and last name to None
+        Note: middle name can be empty
+        '''
+        self.first_name, self.last_name = None, None
+
     @classmethod
-    def register(cls, username, pwd):
+    def register(cls, username, pwd, email, first_name, last_name):
         '''Register a user to the DB with hash password'''
 
         hashed = bcrypt.generate_password_hash(pwd)
@@ -37,7 +73,7 @@ class User(db.Model):
         hashed_utf8 = hashed.decode('utf8')
 
         # return instance of user w/username and hashed pwd
-        return cls(username=username, password=hashed_utf8)
+        return cls(username=username, password=hashed_utf8, email=email, first_name=first_name, last_name=last_name)
 
     @classmethod
     def authenticate(cls, username, pwd):
@@ -54,19 +90,3 @@ class User(db.Model):
 
         else:
             return False
-
-
-class Tweet(db.Model):
-
-    __tablename__ = 'tweets'
-
-    id = db.Column(db.Integer,
-                   primary_key=True,
-                   autoincrement=True)
-
-    text = db.Column(db.Text,
-                     nullable=False)
-
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-
-    user = db.relationship('User', backref='tweets')
