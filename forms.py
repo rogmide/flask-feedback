@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
+from wtforms import StringField, PasswordField, TextAreaField
 from wtforms.validators import InputRequired, Email
 
 
@@ -37,5 +37,5 @@ class FeedbackForm(FlaskForm):
     '''For use for user to sign in'''
 
     title = StringField("Title", validators=[InputRequired()])
-    content = StringField("First Name", validators=[InputRequired()])
+    content = TextAreaField("Content", validators=[InputRequired()])
     imagen_url = StringField("Image Url")

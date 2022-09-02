@@ -1,12 +1,18 @@
-{% extends 'base.html' %} {% block content %} {% include 'form_.html' %}
+{% extends 'base.html' %} {% block title %} {{ user.fullname }} - Details {%
+endblock %} {% block content %} {% include 'form_.html' %}
 <div class="main container">
-  <h5 class="card-title text-success mb-2">{{ user.fullname }}  </h5>
-  <h5 class="card-title text-success mb-2">{{ user.email }} </h5>
+  <h5 class="card-title text-success mb-2">{{ user.fullname }}</h5>
+  <h5 class="card-title text-success mb-2">{{ user.email }}</h5>
   <form action="/users/{{ user.username }}/delete" method="POST">
     <button class="btn btn-sm btn-outline-danger">Cancel Account</button>
   </form>
-  <br>
-  <a class="btn btn-success mb-3 mt-5" href="">Add Feedback</a>
+  <br />
+  <a
+    class="btn btn-success mb-3 mt-5"
+    href="/users/{{ user.username }}/feedback/add"
+    >Add Feedback</a
+  >
+  <h5 class="card-title text-success mb-2">Feedbacks</h5>
   <div class="feedback_holder">
     {% for f in user.feedbacks %}
     <div class="card m-1" style="width: 18rem">
@@ -14,8 +20,16 @@
       <div class="card-body">
         <h6 class="card-title text-success">{{ f.title }}</h6>
         <p class="card-text text-dark">{{ f.content }}</p>
-        <a href="#" class="btn btn-sm btn-secondary mb-4">Edit</a>
-        <a href="#" class="btn btn-sm btn-danger mb-4">Delete</a>
+        <div style="display: flex;">
+          <a
+            href="/feedback/{{ f.id }}/update"
+            class="btn btn-sm btn-secondary mb-4"
+            >Edit</a
+          >
+          <form action="/feedback/{{ f.id }}/delete" method="POST">
+            <button class="btn btn-sm btn-danger mb-4">Delete</button>
+          </form>
+        </div>
       </div>
     </div>
     {% endfor %}

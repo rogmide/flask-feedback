@@ -92,7 +92,10 @@ class User(db.Model):
         else:
             return False
 
-    feedbacks = db.relationship("Feedback", back_populates="user", passive_deletes=True)
+    # this relationship work to delete on cascade
+    # feedbacks back_populates user
+    feedbacks = db.relationship(
+        "Feedback", back_populates="user", passive_deletes=True)
 
 
 class Feedback(db.Model):
@@ -117,4 +120,12 @@ class Feedback(db.Model):
     username = db.Column(db.Text, db.ForeignKey(
         'users.username', ondelete='CASCADE'))
 
+    @classmethod
+    def add_feedback(cls, username, title, content, imagen_url):
+        '''Add a feedback for a user'''
+
+        return cls(title=title, content=content, username=username, imagen_url=imagen_url)
+
+    # this relationship work to delete on cascade
+    # user is back_populates feedbacks
     user = db.relationship('User', back_populates="feedbacks")
