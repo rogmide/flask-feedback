@@ -96,6 +96,26 @@ def get_user(username):
         return render_template('user_info.html', user=user)
 
 
+@app.route('/users/<username>/delete', methods=['POST'])
+def delete_user(username):
+    '''Get User and SHow information on Page'''
+
+    if 'user_id' not in session:
+        flash('You mush be logged to get here', 'danger')
+        return redirect('/')
+    else:
+        user = User.query.filter_by(username=username).first()
+        db.session.delete(user)
+        db.session.commit()
+
+        session.pop('user_id', None)
+        session.pop('user_name', None)
+
+        flash('User Account is Cancel', 'info')
+
+        return redirect('/')
+
+
 @app.route('/secret')
 def get_secret_page():
 
