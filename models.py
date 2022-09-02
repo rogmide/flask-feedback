@@ -1,3 +1,4 @@
+from email.policy import default
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 
@@ -90,3 +91,28 @@ class User(db.Model):
 
         else:
             return False
+
+
+class Feedback(db.Model):
+    '''Feedback Model'''
+
+    __tablename__ = "feedbacks"
+
+    id = db.Column(db.Integer,
+                   primary_key=True,
+                   autoincrement=True)
+
+    title = db.Column(db.String(100),
+                      nullable=False,)
+
+    content = db.Column(db.Text,
+                        nullable=False,)
+
+    imagen_url = db.Column(db.Text,
+                           nullable=False,
+                           default='https://images.unsplash.com/photo-1473830394358-91588751b241?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80')
+
+    username = db.Column(db.Text, db.ForeignKey(
+        'users.username'))
+
+    user = db.relationship('User', backref='feedbacks')

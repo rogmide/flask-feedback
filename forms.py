@@ -31,3 +31,11 @@ class UserSignInForm(FlaskForm):
     password = PasswordField("Password", validators=[InputRequired()])
     first_name = StringField("First Name", validators=[InputRequired()])
     last_name = StringField("Last Name", validators=[InputRequired()])
+
+
+class FeedbackForm(FlaskForm):
+    '''For use for user to sign in'''
+
+    title = StringField("Title", validators=[InputRequired()])
+    content = StringField("First Name", validators=[InputRequired()])
+    imagen_url = StringField("Image Url")

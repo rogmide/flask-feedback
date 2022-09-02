@@ -1,6 +1,6 @@
 from crypt import methods
 from flask import Flask, request, redirect, render_template, session, flash
-from models import User, db, connect_db
+from models import User, Feedback, db, connect_db
 from forms import RegisterForm, TweetForm, UserSignInForm
 from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import IntegrityError
@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///user_auth'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///feedback_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['SECRET_KEY'] = "123"

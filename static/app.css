@@ -11,3 +11,8 @@ body {
 .form-control {
   max-width: 300px;
 }
+
+.feedback_holder {
+  display: flex;
+  width: 90vw;
+}

@@ -1,19 +1,18 @@
 {% extends 'base.html' %} {% block content %} {% include 'form_.html' %}
-<div class="container">
-  <div class="card" style="width: 18rem">
-    <img
-      src="https://images.unsplash.com/photo-1473830394358-91588751b241?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
-      class="card-img-top"
-      alt="..."
-    />
-    <div class="card-body">
-      <h5 class="card-title">{{ user.fullname }}</h5>
-      <p class="card-text">
-        Vulputate dignissim suspendisse in est. Pharetra massa massa
-        ultricies mi quis hendrerit dolor.
-      </p>
-      <a href="#" class="btn btn-primary">Go somewhere</a>
+<div class="main container">
+  <h5 class="card-title text-success mb-2">{{ user.fullname }} - Feedbacks</h5>
+  <div class="feedback_holder">
+    {% for f in user.feedbacks %}
+    <div class="card m-1" style="width: 18rem">
+      <img src="{{ f.imagen_url }}" class="card-img-top" alt="..." />
+      <div class="card-body">
+        <h6 class="card-title text-success">{{ f.title }}</h6>
+        <p class="card-text text-dark">{{ f.content }}</p>
+        <a href="#" class="btn btn-sm btn-secondary mb-4">Edit</a>
+        <a href="#" class="btn btn-sm btn-danger mb-4">Delete</a>
+      </div>
     </div>
+    {% endfor %}
   </div>
 </div>
 
