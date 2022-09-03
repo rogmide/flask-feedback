@@ -22,6 +22,10 @@ class User(db.Model):
                    primary_key=True,
                    autoincrement=True)
 
+    is_admin = db.Column(db.Boolean,
+                         nullable=False,
+                         default=False)
+
     username = db.Column(db.Text,
                          nullable=False,
                          unique=True)

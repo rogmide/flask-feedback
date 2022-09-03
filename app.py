@@ -102,6 +102,12 @@ def get_user(username):
         abort(401)
     else:
         user = User.query.filter_by(username=username).first()
+        
+        if user.is_admin:
+            users = User.query.all()
+            feedbacks = Feedback.query.all()
+            return render_template('user_info.html', user=user, users=users, feedbacks=feedbacks)
+
         return render_template('user_info.html', user=user)
 
 
@@ -228,5 +234,6 @@ def not_found(e):
     return render_template("404.html")
 
 @app.errorhandler(401)
-def custom_401(error):
+def custom_401(e):
+    '''401 Error Handeling'''
     return render_template("401.html")

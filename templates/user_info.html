@@ -20,7 +20,7 @@ endblock %} {% block content %} {% include 'form_.html' %}
       <div class="card-body">
         <h6 class="card-title text-success">{{ f.title }}</h6>
         <p class="card-text text-dark">{{ f.content }}</p>
-        <div style="display: flex;">
+        <div style="display: flex">
           <a
             href="/feedback/{{ f.id }}/update"
             class="btn btn-sm btn-secondary mb-4"
@@ -34,6 +34,44 @@ endblock %} {% block content %} {% include 'form_.html' %}
     </div>
     {% endfor %}
   </div>
+</div>
+
+<div class="container">
+  {% if user.is_admin %}
+  <h1>User List</h1>
+  {% endif %}
+  <div>
+    {% for u in users %}
+    <div class="card w-75">
+      <div class="card-body">
+        <h5 class="card-title">{{ u.fullname }}</h5>
+        <form action="/users/{{ u.username }}/delete" method="POST">
+          <button class="btn btn-sm btn-outline-danger">Cancel Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="container">
+  {% if user.is_admin %}
+  <h1>Feedbacks List</h1>
+  {% endif %}
+  <div>
+    {% for f in feedbacks %}
+    <div class="card w-75">
+      <div class="card-body">
+        <h5 class="card-title">Title: {{ f.title }}</h5>
+        <h5 class="card-title">Owner: {{ f.user.fullname }}</h5>
+        <p class="card-text">Content: {{ f.content }}</p>
+        <form action="/feedback/{{ f.id }}/delete" method="POST">
+          <button class="btn btn-sm btn-danger mb-4">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
 </div>
 
 {% endblock %}
