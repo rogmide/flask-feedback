@@ -42,9 +42,14 @@ endblock %} {% block content %} {% include 'form_.html' %}
   {% endif %}
   <div>
     {% for u in users %}
-    <div class="card w-75">
+    <div class="card w-50">
       <div class="card-body">
-        <h5 class="card-title">{{ u.fullname }}</h5>
+        <h5 class="card-title">
+          Full Name: <span class="text-info">{{ u.fullname }}</span>
+        </h5>
+        <h5 class="card-title">
+          User Name: <span class="text-info">{{ u.username }}</span>
+        </h5>
         <form action="/users/{{ u.username }}/delete" method="POST">
           <button class="btn btn-sm btn-outline-danger">Cancel Account</button>
         </form>
@@ -60,7 +65,7 @@ endblock %} {% block content %} {% include 'form_.html' %}
   {% endif %}
   <div>
     {% for f in feedbacks %}
-    <div class="card w-75">
+    <div class="card w-50">
       <div class="card-body">
         <h5 class="card-title">Title: {{ f.title }}</h5>
         <h5 class="card-title">Owner: {{ f.user.fullname }}</h5>
