@@ -1,17 +1,36 @@
 from crypt import methods
+import email
 from flask import Flask, request, redirect, render_template, session, flash, Response, abort
+from flask_mail import Mail, Message
 from models import User, Feedback, db, connect_db
-from forms import RegisterForm, TweetForm, UserSignInForm, FeedbackForm
+from forms import RegisterForm, TweetForm, UserSignInForm, FeedbackForm, ResetPasswordForm, NewPosswordForm
 from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import IntegrityError
+from hidden_stuff import EMAIL_SECRET_KEY, MAIL_PWD, MAIL_USER
+from flask_bcrypt import Bcrypt
 
+bcrypt = Bcrypt()
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///feedback_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
-app.config['SECRET_KEY'] = "123"
+app.config['SECRET_KEY'] = EMAIL_SECRET_KEY
+
+
+# Mail Config
+app.config['MAIL_SERVER'] = 'smtp.mail.yahoo.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+# If your using SSL
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = MAIL_USER
+app.config['MAIL_PASSWORD'] = MAIL_PWD
+app.config['MAIL_DEFAULT_SENDER'] = 'rogmide@yahoo.com'
+
+
+mail = Mail(app)
 
 connect_db(app)
 
@@ -94,6 +113,62 @@ def login():
     return render_template('login.html', user_regi=form)
 
 
+@app.route('/password_reset', methods=['GET', 'POST'])
+def reset_password():
+    '''Handle Send Email to user to reset password'''
+
+    form = ResetPasswordForm()
+
+    if form.validate_on_submit():
+        flash('Reset request send. Check your Email', 'info')
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            send_mail(user)
+            return redirect('/login')
+
+    return render_template('reset_password.html', form=form)
+
+
+@app.route('/password_reset/<token>/<user_mail>', methods=['GET', 'POST'])
+def reset_token(token, user_mail):
+    '''Verefy that the token is valid'''
+
+    u = User.query.filter_by(email=user_mail).first()
+    user = u.check_token(token)
+
+    if not user[0]:
+        flash('Expire Token!', 'danger')
+        return redirect('/password_reset')
+
+    form = NewPosswordForm()
+    if form.validate_on_submit():
+        hashed_pwd = bcrypt.generate_password_hash(
+            form.new_password.data).decode('utf-8')
+        user[1].password = hashed_pwd
+        db.session.add(user[1])
+        db.session.commit()
+        flash('Password Changed!', 'success')
+        return redirect('/login')
+
+    return render_template('change_password.html', form=form)
+
+
+def send_mail(user):
+    '''Send Email To a User'''
+
+    token = user.get_token()
+    msg = Message('Password Reset Request',
+                  recipients=[user.email])
+    msg.body = f''' To reset your password. Please follow the link below.
+     
+    http://127.0.0.1:5000/password_reset/{token}/{user.email}" - Reset Password Link!
+    
+    If you didn't send a password rest request. Please ignore this message.
+    '''
+
+    mail.send(msg)
+
+
 @app.route('/users/<username>', methods=['GET', 'POST'])
 def get_user(username):
     '''Get User and SHow information on Page'''
@@ -102,7 +177,7 @@ def get_user(username):
         abort(401)
     else:
         user = User.query.filter_by(username=username).first()
-        
+
         if user.is_admin:
             users = User.query.all()
             feedbacks = Feedback.query.all()
@@ -227,11 +302,13 @@ def logout():
     flash('Goodbye', 'info')
     return redirect('/')
 
+
 @app.errorhandler(404)
 def not_found(e):
     '''404 Error Handeling'''
 
     return render_template("404.html")
+
 
 @app.errorhandler(401)
 def custom_401(e):

@@ -39,3 +39,14 @@ class FeedbackForm(FlaskForm):
     title = StringField("Title", validators=[InputRequired()])
     content = TextAreaField("Content", validators=[InputRequired()])
     imagen_url = StringField("Image Url")
+
+
+class ResetPasswordForm(FlaskForm):
+    '''For use for user to sign in'''
+
+    email = StringField("Email", validators=[InputRequired(), Email()])
+
+class NewPosswordForm(FlaskForm):
+    '''For use for user to sign in'''
+
+    new_password = PasswordField("New Password", validators=[InputRequired()])

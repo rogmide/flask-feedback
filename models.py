@@ -1,6 +1,8 @@
 from email.policy import default
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from itsdangerous import TimedSerializer
+from hidden_stuff import EMAIL_SECRET_KEY
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -9,6 +11,7 @@ bcrypt = Bcrypt()
 def connect_db(app):
     db.app = app
     db.init_app(app)
+
 
 # Model go Below
 
@@ -44,6 +47,18 @@ class User(db.Model):
     last_name = db.Column(db.String(30),
                           nullable=False,
                           unique=True)
+
+    def get_token(self):
+        '''Create a Toke for a User'''
+
+        # CREATE A TOKEN TO THE USER
+        serial = TimedSerializer(EMAIL_SECRET_KEY, 'confirmation')
+        return serial.dumps(self.id)
+
+    def check_token(self, token, max_age=300):
+        '''Check that the token is valid'''
+        serial = TimedSerializer(EMAIL_SECRET_KEY, 'confirmation')
+        return [serial.loads(token, max_age=max_age) == self.id, self]
 
     def __repr__(self):
         '''Better Representation of the class'''
