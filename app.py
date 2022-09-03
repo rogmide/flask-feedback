@@ -1,5 +1,5 @@
 from crypt import methods
-from flask import Flask, request, redirect, render_template, session, flash
+from flask import Flask, request, redirect, render_template, session, flash, Response, abort
 from models import User, Feedback, db, connect_db
 from forms import RegisterForm, TweetForm, UserSignInForm, FeedbackForm
 from flask_bcrypt import Bcrypt
@@ -31,6 +31,11 @@ def register():
     '''Register a User in to the app'''
 
     form = UserSignInForm()
+
+    if 'user_name' in session:
+        flash('Your Already Login', 'info')
+
+        return redirect('/')
 
     if form.validate_on_submit():
 
@@ -66,6 +71,11 @@ def login():
 
     form = RegisterForm()
 
+    if 'user_name' in session:
+        flash('Your Already Login', 'info')
+
+        return redirect('/')
+
     if form.validate_on_submit():
 
         name = form.username.data
@@ -89,8 +99,7 @@ def get_user(username):
     '''Get User and SHow information on Page'''
 
     if 'user_id' not in session:
-        flash('You mush be logged to get here', 'danger')
-        return redirect('/')
+        abort(401)
     else:
         user = User.query.filter_by(username=username).first()
         return render_template('user_info.html', user=user)
@@ -101,8 +110,8 @@ def delete_user(username):
     '''Get User and SHow information on Page'''
 
     if 'user_id' not in session:
-        flash('You mush be logged to get here', 'danger')
-        return redirect('/')
+        abort(401)
+
     else:
         user = User.query.filter_by(username=username).first()
         db.session.delete(user)
@@ -123,8 +132,8 @@ def show_feedback_form(username):
     form = FeedbackForm()
 
     if 'user_id' not in session:
-        flash('You mush be logged to get here', 'danger')
-        return redirect('/')
+        abort(401)
+
     else:
 
         if form.validate_on_submit():
@@ -151,8 +160,8 @@ def show_update_feedback(id):
     form = FeedbackForm(obj=feedback)
 
     if 'user_id' not in session:
-        flash('You mush be logged to get here', 'danger')
-        return redirect('/')
+        abort(401)
+
     else:
 
         if form.validate_on_submit():
@@ -181,8 +190,7 @@ def delete_feedback(id):
     '''Delete a Feedback for a User'''
 
     if 'user_id' not in session:
-        flash('You mush be logged to get here', 'danger')
-        return redirect('/')
+        abort(401)
 
     feedback = Feedback.query.get_or_404(id)
     db.session.delete(feedback)
@@ -198,8 +206,7 @@ def get_secret_page():
     '''Show Secret Page for a user that is login'''
 
     if 'user_id' not in session:
-        flash('You mush be logged to get here', 'danger')
-        return redirect('/')
+        abort(401)
     else:
         return render_template('secret.html')
 
@@ -213,3 +220,13 @@ def logout():
     session.pop('user_name', None)
     flash('Goodbye', 'info')
     return redirect('/')
+
+@app.errorhandler(404)
+def not_found(e):
+    '''404 Error Handeling'''
+
+    return render_template("404.html")
+
+@app.errorhandler(401)
+def custom_401(error):
+    return render_template("401.html")
