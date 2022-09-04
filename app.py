@@ -43,8 +43,8 @@ connect_db(app)
 def home_page():
     '''Show Home Page'''
 
-    # db.drop_all()
-    # db.create_all()
+    db.drop_all()
+    db.create_all()
 
     return render_template('home.html')
 
