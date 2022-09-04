@@ -8,6 +8,7 @@ from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import IntegrityError
 from hidden_stuff import EMAIL_SECRET_KEY, MAIL_PWD, MAIL_USER
 from flask_bcrypt import Bcrypt
+import os
 
 bcrypt = Bcrypt()
 
@@ -16,7 +17,8 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///feedback_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
-app.config['SECRET_KEY'] = EMAIL_SECRET_KEY
+app.config['SECRET_KEY'] = os.environ.get(
+    'SECRET_KEY', 'jashdf734625986asdfglkhjasdfasdlfjkg')
 
 
 # Mail Config
