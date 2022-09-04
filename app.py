@@ -29,8 +29,8 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 # If your using SSL
 app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = 'rogmide@yahoo.com'
-app.config['MAIL_PASSWORD'] = 'sbunhsacgpbuwtai'
+app.config['MAIL_USERNAME'] = MAIL_USER
+app.config['MAIL_PASSWORD'] = MAIL_PWD
 app.config['MAIL_DEFAULT_SENDER'] = 'rogmide@yahoo.com'
 
 
