@@ -6,7 +6,7 @@ from models import User, Feedback, db, connect_db
 from forms import RegisterForm, TweetForm, UserSignInForm, FeedbackForm, ResetPasswordForm, NewPosswordForm
 from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import IntegrityError
-from hidden_stuff import EMAIL_SECRET_KEY, MAIL_PWD, MAIL_USER
+# from hidden_stuff import EMAIL_SECRET_KEY, MAIL_PWD, MAIL_USER
 from flask_bcrypt import Bcrypt
 import os
 
